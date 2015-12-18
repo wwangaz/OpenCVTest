@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/model_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:text="Applying Effects to Images"/>
+
+    <RadioGroup
+        android:id="@+id/model_group"
+        android:layout_below="@id/model_title"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+    <RadioButton
+        android:id="@+id/mean_blur_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/mean_blur"/>
+
+    <RadioButton
+        android:id="@+id/gaussian_blur_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/gaussian_blur"/>
+
+    <RadioButton
+        android:id="@+id/sharpen_kernel_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sharpen_kernel"/>
+
+    <RadioButton
+        android:id="@+id/dilation_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dilation"/>
+
+    <RadioButton
+        android:id="@+id/erosion_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/erosion"/>
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/go_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@android:color/holo_blue_bright"
+        android:layout_below="@id/model_group"
+        android:text="@string/go"/>
+
+</RelativeLayout>
