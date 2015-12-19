@@ -7,15 +7,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -39,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Bind(R.id.ivImageProcessed)
     ImageView imageViewProcessed;
+
+    @Bind(R.id.process_model_tv)
+    TextView mProcessModeTV;
 
     private static final int SELECT_PHOTO = 1;
     private static final int SELECT_MODE = 2;
@@ -114,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (id == R.id.action_select_mode) {
             Intent intent = new Intent(context, ChooseModelActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent, SELECT_MODE);
         }
 
         return super.onOptionsItemSelected(item);
@@ -132,13 +136,6 @@ public class MainActivity extends AppCompatActivity {
                         imageView.setImageBitmap(selectedImage);
                         src = new Mat(selectedImage.getHeight(), selectedImage.getWidth(), CvType.CV_8UC4);
                         Utils.bitmapToMat(selectedImage, src);
-                        switch (ACTION_MODE) {
-                            case Constants.MEAN_BLUR:
-                                progressDialog = ProgressDialog.show(context, "", "处理中");
-                                progressDialog.getWindow().setGravity(Gravity.CENTER);
-                                progressDialog.setCancelable(true);
-                                doMeanBlur(src);
-                        }
                     } catch (FileNotFoundException e) {
                         Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -146,24 +143,83 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case SELECT_MODE:
-                if (resultCode == RESULT_OK) {
-                    ACTION_MODE = data.getIntExtra("ACTION_MODE", 0);
+                ACTION_MODE = data.getIntExtra("ACTION_MODE", 0);
+                if (src != null) {
+                    switch (ACTION_MODE) {
+                        case Constants.MEAN_BLUR:
+                            doMeanBlur(src);
+                            break;
+                        case Constants.GAUSSIAN_BLUR:
+                            doGaussianBlur(src);
+                            break;
+                        case Constants.SHARPEN_KERNEL:
+                            doSharpen(src);
+                            break;
+                        case Constants.DILATION:
+                            doDilation(src);
+                            break;
+                        case Constants.EROSION:
+                            doErosion(src);
+                            break;
+                        default:
+                            Toast.makeText(context, "请选择要处理的效果", Toast.LENGTH_SHORT).show();
+                            break;
+                    }
                 }
                 break;
-
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void doMeanBlur(Mat src) {
-        if (src != null) {
-            Imgproc.blur(src, src, new Size(3, 3));
-            Bitmap processedImage = Bitmap.createBitmap(src.cols(), src.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(src, processedImage);
-            imageViewProcessed.setImageBitmap(processedImage);
-        }
-        if (progressDialog != null) {
+    private void doMeanBlur(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.mean_blur));
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.blur(src, dst, new Size(3, 3));
+        setProcessedImage(dst);
+    }
+
+    private void doGaussianBlur(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.gaussian_blur));
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.GaussianBlur(src, dst, new Size(3, 3), 0);
+        setProcessedImage(dst);
+    }
+
+    private void doSharpen(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.sharpen_kernel));
+        Mat kernel = new Mat(3, 3, CvType.CV_16SC1);
+        kernel.put(0, 0, 0, -1, 0, -1, 5, -1, 0, -1, 0);
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.filter2D(src, dst, src.depth(), kernel);
+        setProcessedImage(dst);
+    }
+
+    private void doDilation(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.dilation));
+        Mat kernelDilate = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.dilate(src, dst, kernelDilate);
+        setProcessedImage(dst);
+    }
+
+    private void doErosion(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.erosion));
+        Mat kernelErode = Imgproc.getStructuringElement(Imgproc.CV_SHAPE_ELLIPSE, new Size(5, 5));
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.erode(src, dst, kernelErode);
+        setProcessedImage(dst);
+    }
+
+    private void setProcessedImage(Mat src) {
+        Bitmap processedImage = Bitmap.createBitmap(src.cols(), src.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(src, processedImage);
+        imageViewProcessed.setImageBitmap(processedImage);
+
+        dismissProgress();
+    }
+
+    private void dismissProgress() {
+        if (progressDialog != null)
             progressDialog.dismiss();
-        }
     }
 }
