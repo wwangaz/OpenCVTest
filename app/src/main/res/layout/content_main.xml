@@ -25,6 +25,7 @@
             android:layout_weight="5">
 
             <TextView
+                android:id="@+id/original_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -35,6 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:layout_below="@id/original_text"
                 android:contentDescription="@string/original_des" />
 
         </RelativeLayout>
@@ -53,6 +55,7 @@
             android:layout_weight="5">
 
             <TextView
+                android:id="@+id/processed_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -63,6 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
+                android:layout_below="@id/processed_text"
                 android:contentDescription="@string/processed_des" />
         </RelativeLayout>
 

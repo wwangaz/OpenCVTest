@@ -8,55 +8,78 @@
         android:id="@+id/model_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:text="Applying Effects to Images"/>
+        android:text="Applying Effects to Images"
+        android:textColor="@android:color/black" />
 
     <RadioGroup
         android:id="@+id/model_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/model_title"
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        >
+        android:layout_marginTop="20dp">
 
-    <RadioButton
-        android:id="@+id/mean_blur_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/mean_blur"/>
+        <RadioButton
+            android:id="@+id/mean_blur_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/mean_blur" />
 
-    <RadioButton
-        android:id="@+id/gaussian_blur_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/gaussian_blur"/>
+        <RadioButton
+            android:id="@+id/gaussian_blur_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/gaussian_blur" />
 
-    <RadioButton
-        android:id="@+id/sharpen_kernel_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/sharpen_kernel"/>
+        <RadioButton
+            android:id="@+id/sharpen_kernel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sharpen_kernel" />
 
-    <RadioButton
-        android:id="@+id/dilation_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/dilation"/>
+        <RadioButton
+            android:id="@+id/dilation_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dilation" />
 
-    <RadioButton
-        android:id="@+id/erosion_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/erosion"/>
+        <RadioButton
+            android:id="@+id/erosion_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/erosion" />
+
+        <RadioButton
+            android:id="@+id/threshold_binary_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/threshold_binary"/>
+
+        <RadioButton
+            android:id="@+id/threshold_trunc_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/threshold_trunc"/>
+
+        <RadioButton
+            android:id="@+id/threshold_to_zero_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/threshold_to_zero"/>
+
+        <RadioButton
+            android:id="@+id/adaptive_threshold_gaussian_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/adaptive_threshold_gaussian"/>
     </RadioGroup>
 
     <Button
         android:id="@+id/go_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/model_group"
         android:layout_marginTop="20dp"
         android:background="@android:color/holo_blue_bright"
-        android:layout_below="@id/model_group"
-        android:text="@string/go"/>
+        android:text="@string/go" />
 
 </RelativeLayout>

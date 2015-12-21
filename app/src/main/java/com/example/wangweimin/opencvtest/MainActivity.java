@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SELECT_PHOTO = 1;
     private static final int SELECT_MODE = 2;
-    private static int ACTION_MODE = 0;
+    int actionMode = 0;
 
     private ProgressDialog progressDialog;
     private Context context;
@@ -143,30 +143,45 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case SELECT_MODE:
-                ACTION_MODE = data.getIntExtra("ACTION_MODE", 0);
-                if (src != null) {
-                    switch (ACTION_MODE) {
-                        case Constants.MEAN_BLUR:
-                            doMeanBlur(src);
-                            break;
-                        case Constants.GAUSSIAN_BLUR:
-                            doGaussianBlur(src);
-                            break;
-                        case Constants.SHARPEN_KERNEL:
-                            doSharpen(src);
-                            break;
-                        case Constants.DILATION:
-                            doDilation(src);
-                            break;
-                        case Constants.EROSION:
-                            doErosion(src);
-                            break;
-                        default:
-                            Toast.makeText(context, "请选择要处理的效果", Toast.LENGTH_SHORT).show();
-                            break;
+                actionMode = data.getIntExtra("ACTION_MODE", 0);
+                if (resultCode == RESULT_OK) {
+                    if (src != null) {
+                        progressDialog = ProgressDialog.show(context, "处理中请稍候", "");
+                        switch (actionMode) {
+                            case Constants.MEAN_BLUR:
+                                doMeanBlur(src);
+                                break;
+                            case Constants.GAUSSIAN_BLUR:
+                                doGaussianBlur(src);
+                                break;
+                            case Constants.SHARPEN_KERNEL:
+                                doSharpen(src);
+                                break;
+                            case Constants.DILATION:
+                                doDilation(src);
+                                break;
+                            case Constants.EROSION:
+                                doErosion(src);
+                                break;
+                            case Constants.THRESHOLD_BINARY:
+                                doThresholdBinary(src);
+                                break;
+                            case Constants.THRESHOLD_TRUNC:
+                                doThresholdTrunc(src);
+                                break;
+                            case Constants.THRESHOLD_TO_ZERO:
+                                doThresholdToZero(src);
+                                break;
+                            case Constants.ADAPTIVE_THRESHOLD_GAUSSIAN:
+                                doAdaptiveGaussian(src);
+                                break;
+                            default:
+                                Toast.makeText(context, "请选择要处理的效果", Toast.LENGTH_SHORT).show();
+                                break;
+                        }
                     }
+                    break;
                 }
-                break;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -210,11 +225,39 @@ public class MainActivity extends AppCompatActivity {
         setProcessedImage(dst);
     }
 
+    private void doThresholdBinary(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.threshold_binary));
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.threshold(src, dst, 100, 255, Imgproc.THRESH_BINARY);
+        setProcessedImage(dst);
+    }
+
+    private void doThresholdTrunc(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.threshold_binary));
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.threshold(src, dst, 100, 255, Imgproc.THRESH_TRUNC);
+        setProcessedImage(dst);
+    }
+
+    private void doThresholdToZero(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.threshold_binary));
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC4);
+        Imgproc.threshold(src, dst, 100, 255, Imgproc.THRESH_TOZERO);
+        setProcessedImage(dst);
+    }
+
+    private void doAdaptiveGaussian(@NonNull Mat src) {
+        mProcessModeTV.setText(getString(R.string.threshold_binary));
+        Imgproc.cvtColor(src, src, Imgproc.COLOR_BGR2GRAY);
+        Mat dst = new Mat(src.cols(), src.rows(), CvType.CV_8UC1);
+        Imgproc.adaptiveThreshold(src, dst, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 3, 0);
+        setProcessedImage(dst);
+    }
+
     private void setProcessedImage(Mat src) {
         Bitmap processedImage = Bitmap.createBitmap(src.cols(), src.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(src, processedImage);
         imageViewProcessed.setImageBitmap(processedImage);
-
         dismissProgress();
     }
 

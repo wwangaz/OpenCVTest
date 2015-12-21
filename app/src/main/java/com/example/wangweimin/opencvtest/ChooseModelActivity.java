@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
@@ -36,10 +35,21 @@ public class ChooseModelActivity extends AppCompatActivity {
     @Bind(R.id.erosion_btn)
     RadioButton mErosionBtn;
 
+    @Bind(R.id.threshold_binary_btn)
+    RadioButton mBinaryBtn;
+
+    @Bind(R.id.threshold_trunc_btn)
+    RadioButton mTruncBtn;
+
+    @Bind(R.id.threshold_to_zero_btn)
+    RadioButton mToZeroBtn;
+
+    @Bind(R.id.adaptive_threshold_gaussian_btn)
+    RadioButton mAdaptiveBtn;
+
     @Bind(R.id.go_btn)
     Button mGoBtn;
 
-    private static final int SELECT_MODE = 2;
     private int actionMode;
     private Context context;
 
@@ -66,6 +76,14 @@ public class ChooseModelActivity extends AppCompatActivity {
                     actionMode = Constants.DILATION;
                 } else if (i == mErosionBtn.getId()) {
                     actionMode = Constants.EROSION;
+                } else if (i == mBinaryBtn.getId()) {
+                    actionMode = Constants.THRESHOLD_BINARY;
+                } else if (i == mTruncBtn.getId()) {
+                    actionMode = Constants.THRESHOLD_TRUNC;
+                } else if (i == mToZeroBtn.getId()) {
+                    actionMode = Constants.THRESHOLD_TO_ZERO;
+                } else if (i == mAdaptiveBtn.getId()) {
+                    actionMode = Constants.ADAPTIVE_THRESHOLD_GAUSSIAN;
                 }
             }
         });
@@ -76,7 +94,7 @@ public class ChooseModelActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(context, MainActivity.class);
                 intent.putExtra("ACTION_MODE", actionMode);
-                setResult(SELECT_MODE, intent);
+                setResult(RESULT_OK, intent);
                 finish();
             }
         });

@@ -10,6 +10,10 @@
     <string name="sharpen_kernel">Sharpen Kernel</string>
     <string name="dilation">Dilation</string>
     <string name="erosion">Erosion</string>
+    <string name="threshold_binary">Threshold Binary</string>
+    <string name="threshold_trunc">Threshold Trunc</string>
+    <string name="threshold_to_zero">Threshold To Zero</string>
+    <string name="adaptive_threshold_gaussian">Adaptive Threshold Gaussian</string>
     <string name="go">Go!</string>
 
     <string name="original">Original</string>
