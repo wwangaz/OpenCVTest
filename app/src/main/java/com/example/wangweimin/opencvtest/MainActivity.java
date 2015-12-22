@@ -3,10 +3,14 @@ package com.example.wangweimin.opencvtest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,12 +27,15 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import butterknife.Bind;
@@ -46,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SELECT_PHOTO = 1;
     private static final int SELECT_MODE = 2;
+    private static final int SELECT_ORIGINAL_PIC = 3;
     int actionMode = 0;
 
     private ProgressDialog progressDialog;
@@ -121,6 +129,11 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, SELECT_MODE);
         }
 
+        if (id == R.id.action_select_original) {
+            Intent intent = new Intent(Intent.ACTION_PICK, Uri.parse("content://media/internal/images/media"));
+            startActivityForResult(intent, SELECT_ORIGINAL_PIC);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -141,6 +154,42 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 break;
+
+            case SELECT_ORIGINAL_PIC:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                    if (cursor != null) {
+                        cursor.moveToFirst();
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        String filePath = cursor.getString(columnIndex);
+                        cursor.close();
+
+                        //To speed up loading of Images, set SampleSize
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inSampleSize = 2;
+
+                        Bitmap temp = BitmapFactory.decodeFile(filePath, options);
+
+                        int orientation = 0;
+
+                        try{
+                            ExifInterface imgParams = new ExifInterface(filePath);
+                            orientation = imgParams.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+
+                        Bitmap originalBitmap = rotateBitmap(temp, orientation);
+
+                        Bitmap currentBitmap = originalBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                        Mat currentMat = new Mat(currentBitmap.getHeight(), currentBitmap.getWidth(), CvType.CV_8U);
+                        Utils.bitmapToMat(currentBitmap, currentMat);
+                        setProcessedImage(currentMat);
+                    }
+                }
 
             case SELECT_MODE:
                 actionMode = data.getIntExtra("ACTION_MODE", 0);
@@ -174,6 +223,24 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             case Constants.ADAPTIVE_THRESHOLD_GAUSSIAN:
                                 doAdaptiveGaussian(src);
+                                break;
+                            case Constants.DOG:
+                                doDOG(src);
+                                break;
+                            case Constants.CANNY:
+                                doCanny(src);
+                                break;
+                            case Constants.SOBEL:
+                                doSobel(src);
+                                break;
+                            case Constants.HARRIS_CORNER:
+                                doHarrisCorner(src);
+                                break;
+                            case Constants.HOUGH_LINE:
+                                doHoughLine(src);
+                                break;
+                            case Constants.HOUGH_CIRCLE:
+                                doHoughCirclr(src);
                                 break;
                             default:
                                 Toast.makeText(context, "请选择要处理的效果", Toast.LENGTH_SHORT).show();
@@ -254,6 +321,46 @@ public class MainActivity extends AppCompatActivity {
         setProcessedImage(dst);
     }
 
+    private void doDOG(Mat src){
+        Mat grayMat = new Mat();
+        Mat temp1 = new Mat();
+        Mat temp2 = new Mat();
+
+        Imgproc.cvtColor(src, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+        Imgproc.GaussianBlur(grayMat, temp1, new Size(15, 15), 5);
+        Imgproc.GaussianBlur(grayMat, temp2, new Size(21, 21), 5);
+
+        Mat DoG = new Mat();
+        Core.absdiff(temp1, temp2, DoG);
+
+        Core.multiply(DoG, new Scalar(100), DoG);
+
+        Imgproc.threshold(DoG, DoG, 50, 255, Imgproc.THRESH_BINARY_INV);
+
+        setProcessedImage(DoG);
+    }
+
+    private void doCanny(Mat src){
+
+    }
+
+    private void doSobel(Mat src){
+
+    }
+
+    private void doHarrisCorner(Mat src){
+
+    }
+
+    private void doHoughLine(Mat src){
+
+    }
+
+    private void doHoughCirclr(Mat src){
+
+    }
+
     private void setProcessedImage(Mat src) {
         Bitmap processedImage = Bitmap.createBitmap(src.cols(), src.rows(), Bitmap.Config.ARGB_8888);
         Utils.matToBitmap(src, processedImage);
@@ -261,6 +368,11 @@ public class MainActivity extends AppCompatActivity {
         dismissProgress();
     }
 
+    private Bitmap rotateBitmap(Bitmap src, int orientation){
+        Matrix rotate90 = new Matrix();
+        rotate90.postRotate(orientation);
+        return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), rotate90, false);
+    }
     private void dismissProgress() {
         if (progressDialog != null)
             progressDialog.dismiss();

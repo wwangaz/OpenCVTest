@@ -12,7 +12,7 @@
         android:id="@+id/action_load_image"
         android:title="@string/action_load_image"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         />
 
     <item
@@ -20,5 +20,13 @@
         android:title="@string/action_select_mode"
         android:orderInCategory="2"
         app:showAsAction="ifRoom"
-        />M
+        />
+
+    <item
+        android:id="@+id/action_select_original"
+        android:title="@string/action_select_original"
+        android:orderInCategory="3"
+        app:showAsAction="never"
+        />
+
 </menu>

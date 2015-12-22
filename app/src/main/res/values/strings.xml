@@ -1,10 +1,13 @@
 <resources>
     <!-- button-->
-
+    <string name="effect_text">Effects to Image</string>
+    <string name="feature_text">Features in Image</string>
     <string name="app_name">OpenCVTest</string>
     <string name="action_settings">Settings</string>
     <string name="action_load_image">LoadImage</string>
-    <string name="action_select_mode">SelectMode</string>
+    <string name="action_select_mode">SelectEffects</string>
+    <string name="action_select_original">SelectOriginal</string>
+
     <string name="mean_blur">Mean Blur</string>
     <string name="gaussian_blur">Gaussian Blur</string>
     <string name="sharpen_kernel">Sharpen Kernel</string>
@@ -13,7 +16,16 @@
     <string name="threshold_binary">Threshold Binary</string>
     <string name="threshold_trunc">Threshold Trunc</string>
     <string name="threshold_to_zero">Threshold To Zero</string>
-    <string name="adaptive_threshold_gaussian">Adaptive Threshold Gaussian</string>
+    <string name="adaptive_threshold_gaussian">Adaptive Gaussian</string>
+
+    <string name="dog">Difference of Gaussian</string>
+    <string name="canny">Canny Edge</string>
+    <string name="sobel">Sobel Operator</string>
+    <string name="harris_corner">Harris Corner</string>
+    <string name="hough_line">Hough Lines</string>
+    <string name="hough_circles">Hough Circles</string>
+    <string name="contour">Contour</string>
+
     <string name="go">Go!</string>
 
     <string name="original">Original</string>

@@ -20,6 +20,9 @@ public class ChooseModelActivity extends AppCompatActivity {
     @Bind(R.id.model_group)
     RadioGroup mModelGroup;
 
+    @Bind(R.id.feature_group)
+    RadioGroup mFeatureGroup;
+
     @Bind(R.id.mean_blur_btn)
     RadioButton mMeanBlurBtn;
 
@@ -46,6 +49,24 @@ public class ChooseModelActivity extends AppCompatActivity {
 
     @Bind(R.id.adaptive_threshold_gaussian_btn)
     RadioButton mAdaptiveBtn;
+
+    @Bind(R.id.dog_btn)
+    RadioButton mDOGBtn;
+
+    @Bind(R.id.canny_btn)
+    RadioButton mCannyBtn;
+
+    @Bind(R.id.sobel_btn)
+    RadioButton mSobleBtn;
+
+    @Bind(R.id.harris_btn)
+    RadioButton mHarrisBtn;
+
+    @Bind(R.id.hough_line_btn)
+    RadioButton mHoughLineBtn;
+
+    @Bind(R.id.hough_circle_btn)
+    RadioButton mHoughCircleBtn;
 
     @Bind(R.id.go_btn)
     Button mGoBtn;
@@ -85,7 +106,31 @@ public class ChooseModelActivity extends AppCompatActivity {
                 } else if (i == mAdaptiveBtn.getId()) {
                     actionMode = Constants.ADAPTIVE_THRESHOLD_GAUSSIAN;
                 }
+
+                mFeatureGroup.clearCheck();
             }
+        });
+
+        mFeatureGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                if (i == mDOGBtn.getId()) {
+                    actionMode = Constants.DOG;
+                } else if (i == mCannyBtn.getId()) {
+                    actionMode = Constants.CANNY;
+                } else if (i == mSobleBtn.getId()) {
+                    actionMode = Constants.SOBEL;
+                } else if (i == mHarrisBtn.getId()) {
+                    actionMode = Constants.HARRIS_CORNER;
+                } else if (i == mHoughLineBtn.getId()) {
+                    actionMode = Constants.HOUGH_LINE;
+                } else if (i == mHoughCircleBtn.getId()) {
+                    actionMode = Constants.HOUGH_CIRCLE;
+                }
+
+                mModelGroup.clearCheck();
+            }
+
         });
 
 

@@ -8,8 +8,17 @@
         android:id="@+id/model_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Applying Effects to Images"
+        android:text="@string/effect_text"
         android:textColor="@android:color/black" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/model_title"
+        android:layout_alignParentRight="true"
+        android:gravity="right"
+        android:text="@string/feature_text"
+        android:textColor="@android:color/black"/>
 
     <RadioGroup
         android:id="@+id/model_group"
@@ -71,6 +80,51 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/adaptive_threshold_gaussian"/>
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/feature_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/model_group">
+
+        <RadioButton
+            android:id="@+id/dog_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/dog"/>
+
+        <RadioButton
+            android:id="@+id/canny_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/canny"/>
+
+        <RadioButton
+            android:id="@+id/sobel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sobel"/>
+
+        <RadioButton
+            android:id="@+id/harris_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/harris_corner"/>
+
+        <RadioButton
+            android:id="@+id/hough_line_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hough_line"/>
+
+        <RadioButton
+            android:id="@+id/hough_circle_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/hough_circles"/>
+
     </RadioGroup>
 
     <Button
