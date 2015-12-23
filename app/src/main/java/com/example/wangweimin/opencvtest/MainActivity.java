@@ -30,6 +30,7 @@ import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -37,6 +38,7 @@ import org.opencv.imgproc.Imgproc;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -175,10 +177,10 @@ public class MainActivity extends AppCompatActivity {
 
                         int orientation = 0;
 
-                        try{
+                        try {
                             ExifInterface imgParams = new ExifInterface(filePath);
                             orientation = imgParams.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-                        }catch (IOException e){
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
 
@@ -240,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
                                 doHoughLine(src);
                                 break;
                             case Constants.HOUGH_CIRCLE:
-                                doHoughCirclr(src);
+                                doHoughCircle(src);
                                 break;
                             default:
                                 Toast.makeText(context, "请选择要处理的效果", Toast.LENGTH_SHORT).show();
@@ -321,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         setProcessedImage(dst);
     }
 
-    private void doDOG(Mat src){
+    private void doDOG(Mat src) {
         Mat grayMat = new Mat();
         Mat temp1 = new Mat();
         Mat temp2 = new Mat();
@@ -341,24 +343,130 @@ public class MainActivity extends AppCompatActivity {
         setProcessedImage(DoG);
     }
 
-    private void doCanny(Mat src){
+    private void doCanny(Mat src) {
+        Mat grayMat = new Mat();
+        Mat cannyMat = new Mat();
 
+        Imgproc.cvtColor(src, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+        Imgproc.Canny(grayMat, cannyMat, 10, 100);
+
+        setProcessedImage(cannyMat);
     }
 
-    private void doSobel(Mat src){
+    private void doSobel(Mat src) {
+        Mat grayMat = new Mat();
+        Mat sobel = new Mat();
 
+        Mat grad_x = new Mat();
+        Mat abs_grad_x = new Mat();
+
+        Mat grad_y = new Mat();
+        Mat abs_grad_y = new Mat();
+
+        Imgproc.cvtColor(src, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+        Imgproc.Sobel(grayMat, grad_x, CvType.CV_16S, 1, 0, 3, 1, 0);
+        Imgproc.Sobel(grayMat, grad_y, CvType.CV_16S, 0, 1, 3, 1, 0);
+
+        Core.convertScaleAbs(grad_x, abs_grad_x);
+        Core.convertScaleAbs(grad_y, abs_grad_y);
+
+        Core.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 1, sobel);
+
+        setProcessedImage(sobel);
     }
 
-    private void doHarrisCorner(Mat src){
+    private void doHarrisCorner(Mat src) {
+        Mat grayMat = new Mat();
+        Mat corners = new Mat();
 
+        Imgproc.cvtColor(src, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+        Mat tempMat = new Mat();
+
+        Imgproc.cornerHarris(grayMat, tempMat, 2, 3, 0.04);
+
+        Mat tempMatNorm = new Mat();
+
+        Core.normalize(tempMat, tempMatNorm, 0, 255, Core.NORM_MINMAX);
+
+        Core.convertScaleAbs(tempMatNorm, corners);
+
+        Random r = new Random();
+
+        for (int i = 0; i < corners.cols(); i++) {
+            for (int j = 0; j < corners.rows(); j++) {
+                double[] values = tempMatNorm.get(j, i);
+                if (values[0] > 150) {
+                    Imgproc.circle(corners, new Point(j, i), 5, new Scalar(r.nextInt(255)), 2);
+                }
+            }
+        }
+
+        setProcessedImage(corners);
     }
 
-    private void doHoughLine(Mat src){
+    private void doHoughLine(Mat src) {
+        Mat grayMat = new Mat();
+        Mat cannyEdges = new Mat();
+        Mat lines = new Mat();
 
+        Imgproc.cvtColor(src, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+        Imgproc.Canny(grayMat, cannyEdges, 10, 100);
+
+        Imgproc.HoughLinesP(cannyEdges, lines, 1, Math.PI / 180, 50, 20, 20);
+
+        Mat houghLines = new Mat();
+        houghLines.create(lines.rows(), lines.cols(), CvType.CV_8UC1);
+
+        for (int i = 0; i < lines.cols(); i++) {
+            double[] points = lines.get(0, i);
+            double x1, y1, x2, y2;
+            x1 = points[0];
+            y1 = points[1];
+            x2 = points[3];
+            y2 = points[4];
+
+            Point pt1 = new Point(x1, y1);
+            Point pt2 = new Point(x2, y2);
+
+            Imgproc.line(houghLines, pt1, pt2, new Scalar(255, 0, 0), 1);
+        }
+
+        setProcessedImage(houghLines);
     }
 
-    private void doHoughCirclr(Mat src){
+    private void doHoughCircle(Mat src) {
+        Mat grayMat = new Mat();
+        Mat cannyEdge = new Mat();
+        Mat circles = new Mat();
 
+        Imgproc.cvtColor(src, grayMat, Imgproc.COLOR_BGR2GRAY);
+
+        Imgproc.Canny(grayMat, cannyEdge, 10, 100);
+
+        Imgproc.HoughCircles(cannyEdge, circles, Imgproc.CV_HOUGH_GRADIENT, 1, cannyEdge.rows() / 15);
+
+        Mat houghCircles = new Mat();
+        houghCircles.create(cannyEdge.rows(), cannyEdge.cols(), CvType.CV_8UC1);
+
+        for (int i = 0; i < circles.cols(); i++) {
+            double[] parameters = circles.get(0, i);
+            double x, y;
+            int r;
+
+            x = parameters[0];
+            y = parameters[1];
+            r = (int) parameters[2];
+
+            Point center = new Point(x, y);
+
+            Imgproc.circle(houghCircles, center, r, new Scalar(255, 0, 0));
+        }
+
+        setProcessedImage(houghCircles);
     }
 
     private void setProcessedImage(Mat src) {
@@ -368,11 +476,12 @@ public class MainActivity extends AppCompatActivity {
         dismissProgress();
     }
 
-    private Bitmap rotateBitmap(Bitmap src, int orientation){
+    private Bitmap rotateBitmap(Bitmap src, int orientation) {
         Matrix rotate90 = new Matrix();
         rotate90.postRotate(orientation);
         return Bitmap.createBitmap(src, 0, 0, src.getWidth(), src.getHeight(), rotate90, false);
     }
+
     private void dismissProgress() {
         if (progressDialog != null)
             progressDialog.dismiss();
